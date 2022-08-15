@@ -48,20 +48,25 @@ def get_risk_free_rate(element):
     return answer
 
 
-def get_annualized_return_2(field, n):
-    answer = stats.gmean(df.loc[:, field])
-    power = number_trading / n
-    answer = answer ** power
-    answer = answer - 1
-    return answer
-
-
 def get_annualized_return(data, field):
     total = 0
     for entry in data[field]:
         total = total + entry
 
     return total
+
+
+def get_annualized_return_2(data, field):
+    product = 1
+    n = len(year)
+    for entry in data[field]:
+        entry = (entry / 100) + 1
+        product = product * entry
+
+    answer = float(math.pow(product, (1 / n)))
+    answer = (answer - 1) * 100
+
+    return answer
 
 
 def get_annualized_risk(data, field):
@@ -94,11 +99,6 @@ def get_beta(data, field_1, field_2):
     return answer
 
 
-def get_alpha(data, field_1, field_2):
-    answer = stats.linregress(data[field_1], data[field_2]).intercept
-    return answer
-
-
 for file in os.listdir(directory):
     filename = os.fsdecode(file)
     if filename.endswith(".csv"):
@@ -120,8 +120,8 @@ for file in os.listdir(directory):
             net_present_in = get_first_value_column(df, 'FUND_NET_ASSET_VAL')
             net_present_f = get_last_value_column(df, 'FUND_NET_ASSET_VAL')
             df = df.iloc[1:, :]
-            annualized_return_s = get_annualized_return(df, 'PX_LAST_RATE')
-            annualized_return_b = get_annualized_return(df, 'MT_INDEX_RATE')
+            annualized_return_s = get_annualized_return_2(df, 'PX_LAST_RATE')
+            annualized_return_b = get_annualized_return_2(df, 'MT_INDEX_RATE')
             df['RISK_FREE_D'] = df[['GT10_GOVT']].apply(get_risk_free_rate)
             df['EXCESS_PX_LAST'] = df['PX_LAST_RATE'] - df['RISK_FREE_D']
             df['EXCESS_MT_INDEX'] = df['MT_INDEX_RATE'] - df['RISK_FREE_D']
@@ -145,5 +145,5 @@ for file in os.listdir(directory):
 df_final = pd.DataFrame([{'Ticker': s.ticker, 'Beta': s.beta, 'Std Dev': s.std_dev, 'Sharpe': s.sharpe,
                           'Jensen': s.jensen_alpha, 'Trailing': s.total_trailing_return, 'Annual': s.mean_annual_return}
                          for s in all_csv_property])
-
+df_final.sort_values(['Ticker'], inplace=True)
 print(df_final)
