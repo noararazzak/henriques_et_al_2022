@@ -25,7 +25,8 @@
 .idea/
 __pycache__/
 image_files/
-latex/
+latex_1/
 input/
 output/
+output_txt/
 empty_excels/

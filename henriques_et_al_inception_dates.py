@@ -13,7 +13,7 @@ def make_lists(file):
     return output_list
 
 
-henriques_et_al_2022 = make_lists('Henriques et al_2022_energy.txt')
+henriques_et_al_2022 = make_lists('henriques et al_2022_energy.txt')
 print(henriques_et_al_2022)
 
 filename_active = "empty_excels" + os.path.sep + "Henriques et al_2022_Inception" + ".xlsx"
